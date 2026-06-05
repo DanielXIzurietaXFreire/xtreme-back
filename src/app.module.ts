@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { ClientesModule } from './clientes/clientes.module';
+import { UploadModule } from './upload/upload.module';
 import { HeartbeatController } from './heartbeat.controller';
 
 @Module({
@@ -9,6 +10,7 @@ import { HeartbeatController } from './heartbeat.controller';
     ConfigModule.forRoot({ isGlobal: true }),
     AuthModule,
     ClientesModule,
+    UploadModule,
   ],
   controllers: [HeartbeatController],
   providers: [],
