@@ -17,4 +17,8 @@ export class UploadService {
 
     return { url: publicUrl };
   }
+
+  async updateClientePhotoUrl(id: string, photoUrl: string): Promise<any> {
+    return this.supabaseService.updateItemEmbeddingUrl(id, photoUrl);
+  }
 }

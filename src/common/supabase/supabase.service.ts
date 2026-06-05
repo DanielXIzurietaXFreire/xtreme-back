@@ -60,7 +60,7 @@ export class SupabaseService {
     const response = await fetch(`${this.url}${path}`, {
       ...options,
       headers,
-      body: requestBody,
+      body: requestBody ?? undefined,
     });
 
     const text = await response.text();
@@ -105,9 +105,15 @@ export class SupabaseService {
     return data.publicUrl;
   }
 
-  async updateItemEmbeddingUrl(itemId: string, url: string): Promise<void> {
+  async getClientesWithEmbending(): Promise<any[]> {
+    return this.request('/rest/v1/clientes?select=id,nombre,embending,descriptor&embending=not.is.null', {
+      method: 'GET',
+    });
+  }
+
+  async updateItemEmbeddingUrl(itemId: string, url: string): Promise<any> {
     const { error, data } = await this.client
-      .from('items')
+      .from('clientes')
       .update({ embending: url })
       .eq('id', itemId)
       .select()
@@ -125,5 +131,7 @@ export class SupabaseService {
     if (!data) {
       throw new NotFoundException(`Item with id "${itemId}" was not found.`);
     }
+
+    return data;
   }
 }

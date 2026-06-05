@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Param, Post, Put, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
 import { UploadService } from './upload.service';
@@ -37,5 +37,17 @@ export class UploadController {
     }
 
     return this.uploadService.uploadPhoto(photo, itemId.trim());
+  }
+
+  @Put('clientes/:id/photo-url')
+  async updateClientePhotoUrl(
+    @Param('id') id: string,
+    @Body('photoUrl') photoUrl: string,
+  ) {
+    if (!photoUrl || !photoUrl.trim()) {
+      throw new BadRequestException('photoUrl is required');
+    }
+
+    return this.uploadService.updateClientePhotoUrl(id, photoUrl.trim());
   }
 }
