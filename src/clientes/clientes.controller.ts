@@ -41,4 +41,16 @@ export class ClientesController {
   buscarClientesSimilares(@Body() body: any) {
     return this.clientesService.buscarClientesSimilares(body);
   }
+
+  @Post('register')
+  async registerCliente(
+    @Body()
+    body: {
+      nombre: string;
+      embending: string;
+      descriptor: number[];
+    },
+  ) {
+    return this.clientesService.registerClienteWithDescriptor(body);
+  }
 }

@@ -106,9 +106,10 @@ export class SupabaseService {
   }
 
   async getClientesWithEmbending(): Promise<any[]> {
-    return this.request('/rest/v1/clientes?select=id,nombre,embending,descriptor&embending=not.is.null', {
+    const result = await this.request('/rest/v1/clientes?select=id,nombre,embending,descriptor&descriptor=not.is.null', {
       method: 'GET',
     });
+    return (result as any[]) || [];
   }
 
   async updateItemEmbeddingUrl(itemId: string, url: string): Promise<any> {
