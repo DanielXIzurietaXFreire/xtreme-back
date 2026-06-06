@@ -1,6 +1,5 @@
 import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import fetch, { Headers } from 'node-fetch';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { WebSocket } from 'ws';
 
