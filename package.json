@@ -1,6 +1,11 @@
 {
   "name": "xtreme-back-nestjs",
   "version": "0.0.1",
+  "packageManager": "npm@10",
+  "engines": {
+    "node": "20.x",
+    "npm": "10.x"
+  },
   "private": true,
   "scripts": {
     "start": "nest start",
