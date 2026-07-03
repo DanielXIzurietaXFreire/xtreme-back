@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Param,
   Patch,
   Post,
   Req,
@@ -40,6 +41,30 @@ export class ClientesController {
   @Post('rpc/buscar_clientes_similares')
   buscarClientesSimilares(@Body() body: any) {
     return this.clientesService.buscarClientesSimilares(body);
+  }
+
+  @Post('codigo')
+  createCodigo(@Body() body: { cedula?: string; codigo?: string }) {
+    return this.clientesService.createCodigo(body);
+  }
+
+  @Get('codigo')
+  getCodigo(@Req() req: Request) {
+    const query = req.url.includes('?') ? req.url.split('?')[1] : undefined;
+    return this.clientesService.getCodigo(query);
+  }
+
+  @Get('codigo/:cedula')
+  getCodigoByCedula(@Param('cedula') cedula: string) {
+    return this.clientesService.getCodigoByCedula(cedula);
+  }
+
+  @Patch('codigo/:cedula')
+  updateCodigo(
+    @Param('cedula') cedula: string,
+    @Body() body: { codigo?: string; usado?: boolean; usado_en?: string },
+  ) {
+    return this.clientesService.updateCodigo(cedula, body);
   }
 
   @Post('register')
