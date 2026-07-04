@@ -155,6 +155,8 @@ export class ClientesService {
 
       const payload = {
         codigo,
+        usado: false,
+        usado_en: null,
         updated_at: new Date().toISOString(),
       };
 
@@ -224,6 +226,11 @@ export class ClientesService {
       }
       await this.ensureCodigoUnico(codigo, normalizedCedula);
       payload.codigo = codigo;
+
+      if (body?.usado === undefined) {
+        payload.usado = false;
+        payload.usado_en = null;
+      }
     }
 
     if (body?.usado !== undefined) {
@@ -232,6 +239,8 @@ export class ClientesService {
         payload.usado_en = new Date().toISOString();
       } else if (body?.usado_en !== undefined) {
         payload.usado_en = body.usado_en;
+      } else if (!Boolean(body.usado)) {
+        payload.usado_en = null;
       }
     } else if (body?.usado_en !== undefined) {
       payload.usado_en = body.usado_en;
