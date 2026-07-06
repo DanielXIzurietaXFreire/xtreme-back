@@ -68,14 +68,7 @@ export class ClientesController {
   }
 
   @Post('register')
-  async registerCliente(
-    @Body()
-    body: {
-      nombre: string;
-      embending: string;
-      descriptor: number[];
-    },
-  ) {
+  async registerCliente(@Body() body: Record<string, any>) {
     return this.clientesService.registerClienteWithDescriptor(body);
   }
 }

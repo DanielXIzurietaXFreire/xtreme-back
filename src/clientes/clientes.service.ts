@@ -268,43 +268,45 @@ export class ClientesService {
     }
   }
 
-  async registerClienteWithDescriptor(data: {
-    nombre: string;
-    embending: string;
-    descriptor: number[];
-  }) {
-    // Validar descriptor
-    if (!Array.isArray(data.descriptor)) {
-      throw new BadRequestException('descriptor debe ser un array de números');
+  async registerClienteWithDescriptor(data: Record<string, any>) {
+    if (!data || typeof data !== 'object') {
+      throw new BadRequestException('El cuerpo de la solicitud es inválido');
     }
 
-    if (data.descriptor.length !== 128) {
-      throw new BadRequestException(
-        `descriptor debe contener exactamente 128 elementos, recibido: ${data.descriptor.length}`,
-      );
-    }
-
-    if (!data.descriptor.every((num) => typeof num === 'number')) {
-      throw new BadRequestException('todos los elementos del descriptor deben ser números');
-    }
-
-    // Validar otros campos
-    if (!data.nombre || typeof data.nombre !== 'string') {
+    const nombre = typeof data.nombre === 'string' ? data.nombre.trim() : '';
+    if (!nombre) {
       throw new BadRequestException('nombre es requerido y debe ser un string');
     }
 
-    if (!data.embending || typeof data.embending !== 'string') {
-      throw new BadRequestException('embending es requerido y debe ser un string');
+    const payload: Record<string, any> = { ...data };
+
+    const photoFields = ['photo', 'foto', 'photoUrl', 'fotoUrl', 'avatar', 'image', 'imagen'];
+    for (const field of photoFields) {
+      delete payload[field];
+    }
+
+    if (payload.descriptor !== undefined) {
+      if (!Array.isArray(payload.descriptor)) {
+        throw new BadRequestException('descriptor debe ser un array de números');
+      }
+
+      if (!payload.descriptor.every((num: unknown) => typeof num === 'number')) {
+        throw new BadRequestException('todos los elementos del descriptor deben ser números');
+      }
+    }
+
+    if (payload.embending !== undefined && payload.embending !== null && typeof payload.embending !== 'string') {
+      throw new BadRequestException('embending debe ser un string');
+    }
+
+    if (payload.nombre !== undefined) {
+      payload.nombre = nombre;
     }
 
     try {
       const result = await this.supabase.request('/rest/v1/clientes', {
         method: 'POST',
-        body: JSON.stringify({
-          nombre: data.nombre,
-          embending: data.embending,
-          descriptor: data.descriptor,
-        }),
+        body: JSON.stringify(payload),
         headers: {
           Prefer: 'return=representation',
         },
