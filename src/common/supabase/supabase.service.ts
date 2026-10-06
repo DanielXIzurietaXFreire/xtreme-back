@@ -1,14 +1,11 @@
-import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { WebSocket } from 'ws';
 
 @Injectable()
 export class SupabaseService {
   private readonly url: string;
   private readonly anonKey: string;
   private readonly serviceRoleKey: string;
-  private readonly client: SupabaseClient;
 
   constructor(private readonly configService: ConfigService) {
     this.url = this.configService
@@ -22,15 +19,6 @@ export class SupabaseService {
         'SUPABASE_URL, SUPABASE_ANON_KEY, and SUPABASE_SERVICE_KEY must be configured in environment variables.',
       );
     }
-
-    this.client = createClient(this.url, this.serviceRoleKey, {
-      auth: {
-        persistSession: false,
-      },
-      realtime: {
-        transport: WebSocket as unknown as any,
-      },
-    });
   }
 
   async request<T>(
@@ -74,64 +62,4 @@ export class SupabaseService {
     return responseBody as T;
   }
 
-  async uploadFileToStorage(
-    bucket: string,
-    path: string,
-    data: Buffer,
-    contentType: string,
-  ): Promise<void> {
-    const { error } = await this.client.storage
-      .from(bucket)
-      .upload(path, data, {
-        contentType,
-        upsert: false,
-      });
-
-    if (error) {
-      throw new InternalServerErrorException(
-        `Supabase storage upload failed: ${error.message}`,
-      );
-    }
-  }
-
-  getPublicUrl(bucket: string, path: string): string {
-    const { data } = this.client.storage.from(bucket).getPublicUrl(path);
-
-    if (!data?.publicUrl) {
-      throw new InternalServerErrorException('Public URL was not returned by Supabase.');
-    }
-
-    return data.publicUrl;
-  }
-
-  async getClientesWithEmbending(): Promise<any[]> {
-    const result = await this.request('/rest/v1/clientes?select=id,nombre,embending,descriptor&descriptor=not.is.null', {
-      method: 'GET',
-    });
-    return (result as any[]) || [];
-  }
-
-  async updateItemEmbeddingUrl(itemId: string, url: string): Promise<any> {
-    const { error, data } = await this.client
-      .from('clientes')
-      .update({ embending: url })
-      .eq('id', itemId)
-      .select()
-      .single();
-
-    if (error) {
-      if (error.code === 'PGRST116' || error.code === 'PGRST117') {
-        throw new NotFoundException(`Item with id "${itemId}" was not found.`);
-      }
-      throw new InternalServerErrorException(
-        `Failed to update item: ${error.message}`,
-      );
-    }
-
-    if (!data) {
-      throw new NotFoundException(`Item with id "${itemId}" was not found.`);
-    }
-
-    return data;
-  }
 }

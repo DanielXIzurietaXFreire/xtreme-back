@@ -1,24 +1,23 @@
-# NestJS Supabase Proxy Backend
+# NestJS Supabase Backend
 
-Backend para gestionar autenticación y CRUD de clientes usando Supabase Auth y Supabase REST/RPC.
+Backend para login y CRUD de clientes y códigos usando Supabase Auth y Supabase REST.
 
-## Endpoints implementados
+## Endpoints
 
-### Autenticación y usuarios
-- `POST /auth/v1/signup`
+### Login
 - `POST /auth/v1/token?grant_type=password`
-- `POST /auth/v1/logout`
-- `GET /auth/v1/user`
 
-### CRUD de clientes (requiere token Bearer)
+### CRUD de clientes
 - `POST /rest/v1/clientes`
 - `GET /rest/v1/clientes?select=*`
-- `GET /rest/v1/clientes?id=eq.{id}&select=*`
 - `PATCH /rest/v1/clientes?id=eq.{id}`
 - `DELETE /rest/v1/clientes?id=eq.{id}`
 
-### Comparación de encoding (RPC)
-- `POST /rest/v1/rpc/buscar_clientes_similares`
+### CRUD de códigos
+- `POST /rest/v1/codigo`
+- `GET /rest/v1/codigo`
+- `GET /rest/v1/codigo/:cedula`
+- `PATCH /rest/v1/codigo/:cedula`
 
 ## Configuración
 
@@ -28,7 +27,7 @@ Copia el archivo de ejemplo:
 cp .env.example .env
 ```
 
-Rellena `SUPABASE_URL` y `SUPABASE_ANON_KEY`.
+Rellena `SUPABASE_URL`, `SUPABASE_ANON_KEY` y `SUPABASE_SERVICE_KEY`.
 
 ## Comandos
 
@@ -41,6 +40,5 @@ El servidor se ejecutará en `http://localhost:3000` por defecto.
 
 ## Notas
 
-- El backend funciona como proxy entre el cliente y Supabase.
-- Las solicitudes a `/rest/v1/...` requieren `Authorization: Bearer <access_token>`.
-- El token se valida usando el endpoint de Supabase Auth.
+- El backend funciona como proxy entre la aplicación y Supabase.
+- Este proyecto no ejecuta migraciones ni elimina datos de la base de datos.

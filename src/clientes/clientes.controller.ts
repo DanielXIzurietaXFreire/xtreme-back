@@ -38,11 +38,6 @@ export class ClientesController {
     return this.clientesService.deleteCliente(query);
   }
 
-  @Post('rpc/buscar_clientes_similares')
-  buscarClientesSimilares(@Body() body: any) {
-    return this.clientesService.buscarClientesSimilares(body);
-  }
-
   @Post('codigo')
   createCodigo(@Body() body: { cedula?: string; codigo?: string }) {
     return this.clientesService.createCodigo(body);
@@ -65,10 +60,5 @@ export class ClientesController {
     @Body() body: { codigo?: string; usado?: boolean; usado_en?: string },
   ) {
     return this.clientesService.updateCodigo(cedula, body);
-  }
-
-  @Post('register')
-  async registerCliente(@Body() body: Record<string, any>) {
-    return this.clientesService.registerClienteWithDescriptor(body);
   }
 }

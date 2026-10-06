@@ -101,13 +101,6 @@ export class ClientesService {
     });
   }
 
-  async buscarClientesSimilares(body: any) {
-    return this.supabase.request('/rest/v1/rpc/buscar_clientes_similares', {
-      method: 'POST',
-      body: JSON.stringify(body),
-    });
-  }
-
   async getCodigo(query?: string) {
     return this.supabase.request(this.buildPath('/rest/v1/codigo', query), {
       method: 'GET',
@@ -268,80 +261,4 @@ export class ClientesService {
     }
   }
 
-  async registerClienteWithDescriptor(data: Record<string, any>) {
-    if (!data || typeof data !== 'object') {
-      throw new BadRequestException('El cuerpo de la solicitud es inválido');
-    }
-
-    const nombre = typeof data.nombre === 'string' ? data.nombre.trim() : '';
-    if (!nombre) {
-      throw new BadRequestException('nombre es requerido y debe ser un string');
-    }
-
-    const payload: Record<string, any> = { ...data };
-
-    const photoFields = ['photo', 'foto', 'photoUrl', 'fotoUrl', 'avatar', 'image', 'imagen'];
-    for (const field of photoFields) {
-      delete payload[field];
-    }
-
-    if (payload.descriptor !== undefined) {
-      if (!Array.isArray(payload.descriptor)) {
-        throw new BadRequestException('descriptor debe ser un array de números');
-      }
-
-      if (!payload.descriptor.every((num: unknown) => typeof num === 'number')) {
-        throw new BadRequestException('todos los elementos del descriptor deben ser números');
-      }
-    }
-
-    if (payload.embending !== undefined && payload.embending !== null && typeof payload.embending !== 'string') {
-      throw new BadRequestException('embending debe ser un string');
-    }
-
-    if (payload.nombre !== undefined) {
-      payload.nombre = nombre;
-    }
-
-    try {
-      const result = await this.supabase.request('/rest/v1/clientes', {
-        method: 'POST',
-        body: JSON.stringify(payload),
-        headers: {
-          Prefer: 'return=representation',
-        },
-      });
-
-      return {
-        success: true,
-        message: 'Cliente registrado exitosamente',
-        data: result,
-      };
-    } catch (error: unknown) {
-      console.error('❌ Error al registrar cliente:', error);
-      
-      const errorMessage = (error instanceof Error ? error.message : String(error)) || 'Error desconocido al registrar cliente';
-      
-      // Errores específicos de Supabase
-      if (errorMessage.includes('duplicate key')) {
-        throw new BadRequestException('El cliente ya existe en la base de datos');
-      }
-
-      if (errorMessage.includes('permission denied')) {
-        throw new InternalServerErrorException(
-          'Permiso denegado en la base de datos. Contacta al administrador.',
-        );
-      }
-
-      if (errorMessage.includes('connection')) {
-        throw new InternalServerErrorException(
-          'Error de conexión con la base de datos. Intenta más tarde.',
-        );
-      }
-
-      throw new InternalServerErrorException(
-        `Error al registrar cliente: ${errorMessage}`,
-      );
-    }
-  }
 }
